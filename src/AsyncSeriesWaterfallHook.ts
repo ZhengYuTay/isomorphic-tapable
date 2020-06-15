@@ -6,7 +6,10 @@ export const executeAsyncSeriesWaterfallHook = async (
 ) => {
   for (let i = 0; i < tapFns.length; i++) {
     let promiseResult = await tapFns[i](...args);
-    if (typeof args[0] !== 'undefined') {
+    if (
+      typeof args[0] !== 'undefined' &&
+      typeof promiseResult !== 'undefined'
+    ) {
       args[0] = promiseResult;
     }
   }

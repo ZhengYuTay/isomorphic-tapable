@@ -66,4 +66,27 @@ describe('AsyncSeriesWaterfallHook', () => {
       done();
     });
   });
+
+  it('should retain the old value when fn didnt return value', async () => {
+    const hooks: IHookOpts[] = [
+      {
+        name: 'add 1',
+        fn: obj => {
+          obj.a = 1;
+        },
+      },
+      {
+        name: 'add 2',
+        fn: obj => {
+          obj.b = 2;
+        },
+      },
+    ];
+
+    const result = await runHook(hooks, executeAsyncSeriesWaterfallHook, {});
+    expect(result).toMatchObject({
+      a: 1,
+      b: 2,
+    });
+  });
 });
