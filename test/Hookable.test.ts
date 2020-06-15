@@ -4,21 +4,21 @@ describe('Hookable', () => {
   test('should called in serial: no initialValue', async () => {
     const hook = new Hookable();
     const arr: any[] = [];
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'a',
       fn(val: any) {
         arr.push('a', val);
         return val;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'b',
       fn(val: any) {
         arr.push('b', val);
         return val;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'c',
       fn(val: any) {
         arr.push('c', val);
@@ -32,21 +32,21 @@ describe('Hookable', () => {
 
   test('should called in serial: has initialValue', async () => {
     const hook = new Hookable();
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'a',
       fn(memo: any, p1: any) {
         memo.push('a', p1);
         return memo;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'b',
       fn(memo: any, p1: any) {
         memo.push('b', p1);
         return memo;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'c',
       fn(memo: any, p1: any) {
         memo.push('c', p1);
@@ -61,19 +61,19 @@ describe('Hookable', () => {
 
   test('should called in parallel', async () => {
     const hook = new Hookable();
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'a',
       fn(p1: any) {
         return 'a' + p1;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'b',
       fn(p1: any) {
         return 'b' + p1;
       },
     });
-    hook.addHook('foo', {
+    hook.tap('foo', {
       name: 'c',
       fn(p1: any) {
         return 'c' + p1;

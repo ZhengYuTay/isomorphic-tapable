@@ -38,9 +38,10 @@ async function callParallel<R = unknown>(
 export class Hookable implements IHookable {
   private _hooks = new Map<string, IHookOpts[]>();
 
-  constructor() {}
-
-  addHook(name: string, hook: IHookOpts<any, any[]>) {
+  tap<Config extends IHookConfig = IHookConfig>(
+    name: Config['name'],
+    hook: IHookOpts<Config['initialValue'], Config['args']>
+  ) {
     let hooks = this._hooks.get(name);
     if (!hooks) {
       hooks = [];
@@ -50,15 +51,19 @@ export class Hookable implements IHookable {
     insertHook(hooks, hook);
   }
 
-  async callHook<R = unknown>(name: string, ...args: any[]): Promise<R>;
-  async callHook<R = unknown>(
-    options: ICallHookOpts,
+  callHook<Config extends IHookConfig = IHookConfig>(
+    name: Config['name'],
+    ...args: Config['args']
+  ): Promise<unknown[]>;
+  callHook<Config extends IHookConfig = IHookConfig>(
+    options: ICallHookOpts<Config['name'], Config['initialValue']>,
+    ...args: Config['args']
+  ): Promise<Config['initialValue']>;
+  // implement
+  async callHook(
+    options: string | ICallHookOpts<string>,
     ...args: any[]
-  ): Promise<R>;
-  async callHook<R = unknown>(
-    options: string | ICallHookOpts,
-    ...args: any[]
-  ): Promise<R> {
+  ): Promise<any> {
     const defaultOpts = {
       bail: false,
       parallel: false,
@@ -86,33 +91,22 @@ export class Hookable implements IHookable {
     }
 
     if (opts.parallel) {
-      return await callParallel<R>(hooks, args);
+      return await callParallel(hooks, args);
     } else if (hasInitialValue) {
-      return await callSerailWithInitialValue<R>(
-        hooks,
-        args,
-        opts.initialValue as R
-      );
+      return await callSerailWithInitialValue(hooks, args, opts.initialValue);
     } else {
-      return await callSerail<R>(hooks, args, opts.bail);
+      return await callSerail(hooks, args, opts.bail);
     }
   }
 
-  on<Config extends IHookConfig>(
+  on<Config extends IHookConfig = IHookConfig>(
     event: Config['name'],
     listener: (...args: Config['args']) => void
   ) {
-    this.addHook(event, { name: 'listener', fn: listener });
+    this.tap<any>(event, { name: 'listener', fn: listener });
   }
 
-  tap<Config extends IHookConfig>(
-    hook: Config['name'],
-    opts: IHookOpts<Config['initialValue'], Config['args']>
-  ) {
-    this.addHook(hook, opts);
-  }
-
-  emitEvent<Config extends IHookConfig>(
+  emitEvent<Config extends IHookConfig = IHookConfig>(
     name: Config['name'],
     ...args: Config['args']
   ): void {
