@@ -38,6 +38,13 @@ async function callParallel<R = unknown>(
 export class Hookable implements IHookable {
   private _hooks = new Map<string, IHookOpts[]>();
 
+  constructor() {
+    this.tap = this.tap.bind(this);
+    this.callHook = this.callHook.bind(this);
+    this.on = this.on.bind(this);
+    this.emitEvent = this.emitEvent.bind(this);
+  }
+
   tap<Config extends IHookConfig = IHookConfig>(
     name: Config['name'],
     hook: IHookOpts<Config['initialValue'], Config['args']>
