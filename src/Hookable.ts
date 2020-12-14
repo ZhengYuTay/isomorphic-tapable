@@ -107,13 +107,13 @@ export class Hookable implements IHookable {
     event: Config['name'],
     listener: (...args: Config['args']) => void
   ) {
-    this.tap<any>(event, { name: 'listener', fn: listener });
+    return this.tap<any>(event, { name: 'listener', fn: listener });
   }
 
   emitEvent<Config extends IHookConfig = IHookConfig>(
     name: Config['name'],
     ...args: Config['args']
-  ): void {
-    this.callHook({ name, parallel: true }, ...args);
+  ) {
+    return this.callHook({ name, parallel: true }, ...args);
   }
 }
